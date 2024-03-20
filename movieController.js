@@ -1,11 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const fs =require('fs');
-const {Sequelize, QueryTypes} = require('sequelize')
+const {Sequelize, QueryTypes, DataTypes} = require('sequelize')
 let sequelize = new Sequelize('sqlite:db.sqlite');
 
+const  Movie= sequelize.define('Movie',{
+    name: {
+        type: DataTypes.STRING,
+        allownull: false,
+    },
+    year:{
+        type: DataTypes.INTEGER,
+        allownull: false,
+    },
+    description:{
+        type: DataTypes.TEXT,
+    },
+    id:{
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    }
+    
+    
+},{tabelname:'movies', timestamps: false});
+
 router.get('/',async(req, res) =>{
-    let movies = await sequelize.query('SELECT * FROM movies',({type: QueryTypes.SELECT}))
+    let movies = await Movie.findAll();
 res.render('movies/index.njk',{ movies: movies});
 });
  router.get('/add',(req, res) =>{
@@ -14,23 +35,30 @@ res.render('movies/index.njk',{ movies: movies});
 });
 
  router.post('/add', async(req, res) =>{
- await sequelize.query(`INSERT INTO movies (name,year,description) VALUES('${req.body.movie}',${req.body.year}, '${req.body.description}') `,{type: QueryTypes.INSERT});
-res.redirect('/movies/')
+    await Movie.create({name:req.body.movie, year:req.body.year, description: req.body.description});
+    res.redirect('/movies/')
     });
    
 
 
  router.get('/view', async(req, res) => {
     let id = parseInt(req.query.id);
-    let movies = await sequelize.query(`SELECT * FROM movies WHERE id=${id};` , {type: QueryTypes.SELECT});
-    let movie = movies[0];
+  
+    let movie = await Movie.findOne({
+        where: {
+            id: req.query.id
+        }
+
+    })
     res.render ('movies/view.njk', {movie : movie})
 });
 router.get('/edit/:id',async(req, res) => {
-    let id = parseInt(req.params.id);
-    let movies = await sequelize.query(`SELECT * FROM movies WHERE id=${id};` , {type: QueryTypes.SELECT});
-    let movie = movies[0];
-    res.render ('movies/edit.njk', {movie : movie})
+    await Movie.update({name:req.body.movie, year:req.body.year, description: req.body.description},{
+        where: {
+            id: req.params.id
+}
+});
+ res.redirect('/movies/');
 });
 router.post('/edit/:id',async (req, res) =>{
     let id = parseInt(req.params.id);
@@ -43,8 +71,11 @@ router.post('/edit/:id',async (req, res) =>{
     res.redirect('/movies/');
 });
 router.get('/delete/:id',async(req, res) => {
-    let id = parseInt(req.params.id);
-  await sequelize.query('DELETE FORM movies WHERE ' id=$(id);', {type: QueryTypes.SELECT});
+    await Movie.destroy({
+        where:{
+            id: req.params.id
+        }
+    });
     res.redirect('/movies/');
 });
 module.exports =router;
