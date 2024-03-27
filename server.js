@@ -3,6 +3,13 @@ const nunjucks = require('nunjucks')
 const app = express();
 const port = 3000;
 
+const cookieParser = require('cookie-parser')
+app.use(cookieParser())
+const session = require('express-session');
+app.use(session({
+  secret: 'secret'
+}))
+
 app.use(express.urlencoded({
   extended:true
 }));
@@ -39,7 +46,18 @@ app.post('/circle', (req, res) => {
   let volume = 4/3 * Math.PI * req.body.radius * req.body.radius * req.body.radius;
   res.render('circleAnswer.njk',{r: req.body.radius, a: area, d: diameter, v: volume });
 });
+const movieController =require('./src/movieController.js');
+app.use('/movies', movieController);
 
+app.get('/cookie', (req, res)=> {
+res.cookie('mycookie', 'sexy cookie', {maxAge:1000*60*60*24*30})
+res.send(req.cookies);
+if(!req.session.secretValue)
+res.session.secretValue = 'shush baby'
+res.send(req.session);
+});
+const authController = require('./src/models/authController.js');
+app.use(authController)
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);

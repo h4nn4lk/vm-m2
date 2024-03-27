@@ -1,6 +1,9 @@
     {% extends "partials/layout.njk"%}
     {% block content %}
-    <h1>form <sub>hanna vaga lahe form</sub></h1>
+    <h1>hanna<sub>vaga lahe form</sub></h1>
+    {% if fname and lname and age and phone %}
+    <p>hello {{ fname }} {{ lname }}, are you {{ age }} cause at that age you are just my type</p>
+    {% endif %}
     <form >
          <p>
         <label for="fname">first name</label><br>
