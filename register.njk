@@ -1,0 +1,12 @@
+
+    {% extends "partials/layout.njk"%}
+    {% block title %} add{% endblock %}
+     {% block content %}
+    <form action="/register" method="POST">
+        <input type="text" placeholder="name" name= "name">
+        <input type="email" placeholder="email" name= "email">
+        <input type="password" placeholder="password" name= "password">
+        <input type="password" placeholder="password Confrimation" name= "password_confirm">
+        <input type="submit" value = "Register">
+    </form>
+    {% endblock %}
