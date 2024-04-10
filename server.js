@@ -12,7 +12,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   secret: 'secret'
-}))
+}));
+
 
 app.use(express.urlencoded({
   extended:true
@@ -25,8 +26,11 @@ const env = nunjucks.configure('views', {
 });
 
 app.use((req, res, next) => {
-  env.addGlobal('user', req.session.user)
-  next()
+  env.addGlobal('user', req.session.user);
+  env.addGlobal('errors', req.session.errors);
+  req.session.errors =null;
+  req.session.save();
+  next();
 });
 
 app.get('/', (req, res) => {
